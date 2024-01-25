@@ -5,7 +5,7 @@
   Alex Lea, Connor Nightingale, Eddy Zhang, Jacob Carulli
 */
 
-// Define Pinouts 
+// Define Pinouts hi
 int red = 8;
 int green = 9;
 int blue = 10;
