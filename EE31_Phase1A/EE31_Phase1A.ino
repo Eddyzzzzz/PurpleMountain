@@ -152,7 +152,7 @@ void sleep_state() {
   // Blink @ 4 Hz for 1 sec
   for (int i = 0; i < 2; i++) {
     digitalWrite(blue, HIGH);  // turn the LED on (HIGH is the voltage level)
-    delay(250);                 // wait for 0.5 s (2 Hz)
+    delay(250);               
     digitalWrite(blue, LOW);   // turn the LED off by making the voltage LOW
     delay(250); 
   } 
@@ -165,7 +165,7 @@ void sleep_state() {
     // change the brightness for next time through the loop:
     brightness = brightness - fadeAmount;
     
-    // wait for 120 milliseconds to see the dimming effect
+    // wait for 20 milliseconds to see the dimming effect
     delay(20);
 
     // write brightness
