@@ -9,10 +9,15 @@
 int red = 8;
 int green = 9;
 int blue = 10;
+int power_button = 12;
+int function_button = 13;
 
 // Define variables
 int brightness = 255;  // how bright the LED is
 int fadeAmount = 5;  // how many points to fade the LED by
+enum State { on, off, run, sleep, diagnostic };
+enum Button { power, function };
+State curr_state;
 
 // the setup function runs once when you press reset or power the board
 void setup() {
@@ -20,10 +25,17 @@ void setup() {
   pinMode(red, OUTPUT);
   pinMode(blue, OUTPUT);
   pinMode(green, OUTPUT);
+
+  // loop is current ISR function, might need adjustment
+  attachInterrupt(digitalPinToInterrupt(power_button), loop, RISING);
+  attachInterrupt(digitalPinToInterrupt(function_button), loop, RISING);
+
+  curr_state = off;
 }
 
 // the loop function runs over and over again forever
 void loop() {
+  
   // on_state();
   // off_state();
   // run_state();
@@ -32,6 +44,45 @@ void loop() {
 }
 
 // Function Section below --------------------------------------------------------
+
+State get_next_state(State prev_state, Button button_pressed) {
+  // wait to detect short vs. long press
+  delay(200);
+  if (button_pressed = power) {
+    // long press turns system on or off
+    if (digitalRead(power_button) == HIGH) {
+      if (prev_state == off) {
+        return on;
+      } else {
+        return off;
+      } 
+    // short press enters or exits sleep mode
+    } else {
+      if (prev_state == on) {
+        return sleep;
+      } else if (prev_state == sleep) {
+        return on;
+      } else if (prev_state != off) {
+        return sleep;
+      }
+    }
+  } else {
+    // function button can only be accessed from on state
+    if (prev_state == on) {
+      // for short press, enter run state
+      if (digitalRead(function_button) == LOW) {
+        return run;
+      // for long press, enter diagnostic state
+      } else {
+        return diagnostic;
+      }
+    }
+  }
+
+  // if button press not valid, do not change state
+  return prev_state;
+}
+
 
 // State      : On 
 // Description: Red LED Blinks @ 10 Hz 
