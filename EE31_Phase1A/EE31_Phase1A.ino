@@ -5,49 +5,125 @@
   Alex Lea, Connor Nightingale, Eddy Zhang, Jacob Carulli
 */
 
-// Define Pinouts hi
+// Define Pinouts
 int red = 8;
 int green = 9;
 int blue = 10;
-int power_button = 12;
-int function_button = 13;
+int power_button = 2;
+int function_button = 3;
 
 // Define variables
 int brightness = 255;  // how bright the LED is
 int fadeAmount = 5;  // how many points to fade the LED by
+
+// NOTE: enum variables return an integer (their index in the enumeration)
 enum State { on, off, run, sleep, diagnostic };
 enum Button { power, function };
-State curr_state;
+enum State curr_state;
 
 // the setup function runs once when you press reset or power the board
 void setup() {
+  // important for using serial monitor
+  Serial.begin(9600);
+
   // initialize digital pins as outputs.
   pinMode(red, OUTPUT);
   pinMode(blue, OUTPUT);
   pinMode(green, OUTPUT);
 
   // loop is current ISR function, might need adjustment
-  attachInterrupt(digitalPinToInterrupt(power_button), loop, RISING);
-  attachInterrupt(digitalPinToInterrupt(function_button), loop, RISING);
+  attachInterrupt(digitalPinToInterrupt(power_button), power_pressed, RISING);
+  attachInterrupt(digitalPinToInterrupt(function_button), function_pressed, RISING);
 
-  curr_state = off;
+  // NOTE: enum variables are set using the names of the enumerations
+  curr_state = run;
 }
 
 // the loop function runs over and over again forever
 void loop() {
-  
-  // on_state();
-  // off_state();
-  // run_state();
-  sleep_state();
-  // diagnostic_state();
+// NOTE: enum variables return an integer (their index in the enumeration)
+
+  // if (curr_state == 0) {
+  //   Serial.println("on");
+  //   on_state();
+  // }
+  // else if (curr_state == 1) {
+  //   Serial.println("off");
+  //   off_state();
+  // }
+  // else if (curr_state == 2) {
+  //   Serial.println("run");
+  //   run_state();
+  // }
+  // else if (curr_state == 3) {
+  //   Serial.println("sleep");
+  //   sleep_state();
+  // }
+  // else {
+  //   Serial.println("diagnostic");
+  //   diagnostic_state();
+  // }
+
+  Serial.println(digitalRead(power_button));
+  delay(100);
 }
 
 // Function Section below --------------------------------------------------------
 
+// This function updated curr_state after the power button was pressed
+void power_pressed() {
+  // wait one second to detect short vs. long press
+  delay(1000);
+
+  Serial.println(curr_state);
+  enum State next_state;
+
+  // long press turns system on or off
+  if (digitalRead(power_button) == HIGH) {
+    if (curr_state == 1) {
+      next_state = on; // change from off to on
+    } else {
+      next_state = off; // change to off
+    } 
+    
+  // short press enters or exits sleep mode
+  } else {
+    if (curr_state == 0) {
+      next_state = sleep; // change from on to sleep
+      
+    } else if (curr_state == 3) {
+      next_state = on; // change from sleep to on
+    } else if (curr_state != 1) {
+      next_state = sleep; // if curr_state is not off, set next state to sleep
+    }
+  }
+
+  curr_state = next_state;
+}
+
+// This function updated curr_state after the function button was pressed
+void function_pressed() {
+  // function button can only be accessed from on state
+    if (curr_state == 0) {
+      // for short press, enter run state
+      if (digitalRead(function_button) == LOW) {
+        curr_state = run;
+      // for long press, enter diagnostic state
+      } else {
+        curr_state = diagnostic;
+      }
+    }
+}
+
+
+
+/*
+ * NOTE: This function has been decomposed into power_pressed and function_pressed
+ * If we get those working, this one can be deleted
+ *
 State get_next_state(State prev_state, Button button_pressed) {
-  // wait to detect short vs. long press
-  delay(200);
+  // wait one second to detect short vs. long press
+  delay(1000);
   if (button_pressed = power) {
     // long press turns system on or off
     if (digitalRead(power_button) == HIGH) {
@@ -82,6 +158,7 @@ State get_next_state(State prev_state, Button button_pressed) {
   // if button press not valid, do not change state
   return prev_state;
 }
+*/
 
 
 // State      : On 
@@ -113,6 +190,8 @@ void off_state() {
 // Status     : Fully functional
 void run_state() {
 
+  Serial.print("top");
+
   // turn the other LEDs off by making the voltage LOW
   digitalWrite(blue, LOW);   
   digitalWrite(red, LOW); 
@@ -120,7 +199,11 @@ void run_state() {
   // set the brightness of pin 12:
   analogWrite(green, brightness = 255);
 
+  
+
   while (brightness > 0) {
+    Serial.print("in loop");
+    
     // change the brightness for next time through the loop:
     brightness = brightness - fadeAmount;
     
@@ -180,21 +263,20 @@ void sleep_state() {
 //              B) Show 8 problems situations.
 // Status     : Working
 void diagnostic_state() {
-  /* pseudocode
+  // we eventually need to blink N times for N problems
+
+  // for now, just blink red once
 
   // turn the other LEDs off by making the voltage LOW
   digitalWrite(blue, LOW);   
   digitalWrite(green, LOW); 
 
-  for (int i = 0; i < num_error; i++) {
+  //for (int i = 0; i < num_error; i++) {
     digitalWrite(red, HIGH);  // turn the LED on (HIGH is the voltage level)
     delay(200);                      
     digitalWrite(red, LOW);   // turn the LED off by making the voltage LOW
     delay(200);                      
-  }
+  //}
 
-  delay(10000)                // delay for 10 seconds 
-
-  */
-
+  // delay(10000)                // delay for 10 seconds 
 }
