@@ -5,6 +5,10 @@
   Alex Lea, Connor Nightingale, Eddy Zhang, Jacob Carulli
 */
 
+//Define millis for timing
+unsigned long startMillis;
+unsigned long currentMillis;
+
 // Define Pinouts
 int red = 8;
 int green = 9;
@@ -42,6 +46,8 @@ void setup() {
 
   // NOTE: enum variables are set using the names of the enumerations
   curr_state = run;
+  //Inital the start time
+  startMillis = millis();
 }
 
 // the loop function runs over and over again forever
@@ -268,6 +274,7 @@ void sleep_state() {
 // Status     : Working
 void diagnostic_state() {
   // we eventually need to blink N times for N problems
+  const unsigned long period = 200;
 
   // for now, just blink red once
 
@@ -283,4 +290,9 @@ void diagnostic_state() {
   //}
 
   // delay(10000)                // delay for 10 seconds 
+}
+
+void millisDelay( long int delayTime){
+  long int start_time = millis();
+  while ( millis() - start_time < delayTime) ;
 }
