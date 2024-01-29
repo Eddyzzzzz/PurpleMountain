@@ -77,7 +77,7 @@ void loop() {
     diagnostic_state();
   }
   //Serial.println(digitalRead(2));
-  delay(100);
+  millisDelay(100);
 }
 
 // Function Section below --------------------------------------------------------
@@ -179,9 +179,9 @@ void on_state() {
   digitalWrite(green, LOW); 
 
   digitalWrite(red, HIGH);  // turn the LED on (HIGH is the voltage level)
-  delay(100);                      // wait for 0.1 s (10 Hz)
+  millisDelay(100);                      // wait for 0.1 s (10 Hz)
   digitalWrite(red, LOW);   // turn the LED off by making the voltage LOW
-  delay(100);                      // wait for 0.1 s (10 Hz)
+  millisDelay(100);                      // wait for 0.1 s (10 Hz)
 }
 
 // State      : Off
@@ -197,7 +197,7 @@ void off_state() {
 // Description: Green LED decay with time constant of 6 secs. 
 //              Flashes twice for duty cycle of 0.5 secs, then repeats while in state.
 // Status     : Fully functional
-void run_state(int potent) {
+void run_state(unsigned long potent) {
   Serial.print("top");
   int potentiometer = analogRead(4);
   //Serial.print(potentiometer);
@@ -218,7 +218,7 @@ void run_state(int potent) {
     brightness = brightness - fadeAmount;
     
     // wait for 120 milliseconds to see the dimming effect
-    delay(120);
+    millisDelay(120);
 
     // write brightness
     analogWrite(green, brightness);
@@ -226,9 +226,9 @@ void run_state(int potent) {
 
   for (int i = 0; i < 2; i++) {
     digitalWrite(green, HIGH);  // turn the LED on (HIGH is the voltage level)
-    delay(500 - potent);                 // wait for 0.5 s (2 Hz)
+    millisDelay(500 - potent);                 // wait for 0.5 s (2 Hz)
     digitalWrite(green, LOW);   // turn the LED off by making the voltage LOW
-    delay(500 - potent); 
+    millisDelay(500 - potent); 
   } 
   
 }
@@ -245,9 +245,9 @@ void sleep_state() {
   // Blink @ 4 Hz for 1 sec
   for (int i = 0; i < 2; i++) {
     digitalWrite(blue, HIGH);  // turn the LED on (HIGH is the voltage level)
-    delay(250);               
+    millisDelay(250);               
     digitalWrite(blue, LOW);   // turn the LED off by making the voltage LOW
-    delay(250); 
+    millisDelay(250); 
   } 
 
   // Fade 
@@ -259,7 +259,7 @@ void sleep_state() {
     brightness = brightness - fadeAmount;
     
     // wait for 20 milliseconds to see the dimming effect
-    delay(20);
+    millisDelay(20);
 
     // write brightness
     analogWrite(blue, brightness);
@@ -284,9 +284,9 @@ void diagnostic_state() {
 
   //for (int i = 0; i < num_error; i++) {
     digitalWrite(red, HIGH);  // turn the LED on (HIGH is the voltage level)
-    delay(200);                      
+    millisDelay(200);                      
     digitalWrite(red, LOW);   // turn the LED off by making the voltage LOW
-    delay(200);                      
+    millisDelay(200);                      
   //}
 
   // delay(10000)                // delay for 10 seconds 
