@@ -5,22 +5,19 @@
   Alex Lea, Connor Nightingale, Eddy Zhang, Jacob Carulli
 */
 
-<<<<<<< HEAD
-// Define Digital Pinouts
-=======
+
 //Define millis for timing
 unsigned long startMillis;
 unsigned long currentMillis;
 
-// Define Pinouts
->>>>>>> 50fdef0f59e4e4bfe11845b5b7496323c6699bcd
+// Define Digital Pinouts
 int red = 8;
 int green = 9;
 int blue = 10;
 int power_button = 11;
-int sleep_button = 3;
-int run_button = 4;
-int diagnosis_button = 7;
+int sleep_button = 6;
+int run_button = 5;
+int diagnosis_button = 4;
 
 // Define Analog Pinouts
 int potent_pattern = 4;
@@ -54,7 +51,6 @@ void setup() {
   attachInterrupt(digitalPinToInterrupt(sleep_button), sleep_pressed, RISING);
   attachInterrupt(digitalPinToInterrupt(diagnosis_button), diagnostic_pressed, RISING);
 
-
   // NOTE: enum variables are set using the names of the enumerations
   curr_state = run;
   //Inital the start time
@@ -65,36 +61,9 @@ void setup() {
 void loop() {
 // NOTE: enum variables return an integer (their index in the enumeration)
 
-<<<<<<< HEAD
   int pattern_value = analogRead(potent_pattern);
   int brightness_value = analogRead(potent_brightness);
 
-  // if (curr_state == 0) {
-  //   Serial.println("on");
-  //   on_state();
-  // }
-  // else if (curr_state == 1) {
-  //   Serial.println("off");
-  //   off_state();
-  // }
-  // else if (curr_state == 2) {
-  //   Serial.println("run");
-  //   run_state(pattern_value, brightness_value);
-  // }
-  // else if (curr_state == 3) {
-  //   Serial.println("sleep");
-  //   sleep_state();
-  // }
-  // else {
-  //   Serial.println("diagnostic");
-  //   diagnostic_state();
-  // }
-  // //Serial.println(digitalRead(2));
-  delay(300);
-
-  
-  Serial.println(potentiometer);
-=======
   if (curr_state == 0) {
     Serial.println("on");
     on_state();
@@ -105,7 +74,7 @@ void loop() {
   }
   else if (curr_state == 2) {
     Serial.println("run");
-    run_state(potent_value);
+    run_state(pattern_value, brightness_value);
   }
   else if (curr_state == 3) {
     Serial.println("sleep");
@@ -115,9 +84,8 @@ void loop() {
     Serial.println("diagnostic");
     diagnostic_state();
   }
-  //Serial.println(digitalRead(2));
+
   millisDelay(100);
->>>>>>> 50fdef0f59e4e4bfe11845b5b7496323c6699bcd
 }
 
 // Function Section below --------------------------------------------------------
@@ -126,7 +94,8 @@ void loop() {
 void power_pressed() {
   Serial.println("power press");
   // wait .1 s to prevent loop from running multiple times during one press (CANNOT USE delay())
-  
+  //millisDelay(100);
+
   if (curr_state == 1) {
     Serial.println("changing to on");
     curr_state = on; // change from off to on
@@ -134,8 +103,6 @@ void power_pressed() {
     Serial.println("changing to off");
     curr_state = off; // change to off
   } 
-
-
 }
 
 //Tell if we have pressed the run button
@@ -190,24 +157,13 @@ void off_state() {
 // Description: Green LED decay with time constant of 6 secs. 
 //              Flashes twice for duty cycle of 0.5 secs, then repeats while in state.
 // Status     : Fully functional
-<<<<<<< HEAD
 void run_state(int pattern, int brightness_potentiometer) {
-  
-=======
-void run_state(unsigned long potent) {
-  Serial.print("top");
-  int potentiometer = analogRead(4);
-  //Serial.print(potentiometer);
-
->>>>>>> 50fdef0f59e4e4bfe11845b5b7496323c6699bcd
   // turn the other LEDs off by making the voltage LOW
   digitalWrite(blue, LOW);   
   digitalWrite(red, LOW); 
 
   // set the brightness of pin 12:
   analogWrite(green, brightness = 255);
-
-  
 
   while (brightness > 0) {
     //Serial.print("in loop");
@@ -224,15 +180,14 @@ void run_state(unsigned long potent) {
 
   for (int i = 0; i < 2; i++) {
     digitalWrite(green, HIGH);  // turn the LED on (HIGH is the voltage level)
-<<<<<<< HEAD
-    delay(500 - (pattern/2));                 // wait for 0.5 s (2 Hz)
+
+    millisDelay(500 - (pattern/2));                 // wait for 0.5 s (or less depending on potentiometer value)
     digitalWrite(green, LOW);   // turn the LED off by making the voltage LOW
-    delay(500 - (pattern/2)); 
-=======
-    millisDelay(500 - potent);                 // wait for 0.5 s (2 Hz)
+    millisDelay(500 - (pattern/2)); 
+
+    millisDelay(500 - (pattern/2));                 // wait for 0.5 s (or less depending on potentiometer value)
     digitalWrite(green, LOW);   // turn the LED off by making the voltage LOW
-    millisDelay(500 - potent); 
->>>>>>> 50fdef0f59e4e4bfe11845b5b7496323c6699bcd
+    millisDelay(500 - (pattern/2)); 
   } 
   
 }
@@ -277,6 +232,7 @@ void sleep_state() {
 //              B) Show 8 problems situations.
 // Status     : Working
 void diagnostic_state() {
+  
   // we eventually need to blink N times for N problems
   const unsigned long period = 200;
 
@@ -293,7 +249,6 @@ void diagnostic_state() {
     millisDelay(200);                      
   //}
 
-  // delay(10000)                // delay for 10 seconds 
 }
 
 void millisDelay( long int delayTime){
