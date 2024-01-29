@@ -14,7 +14,7 @@ unsigned long currentMillis;
 int red = 8;
 int green = 9;
 int blue = 10;
-int power_button = 11;
+int power_button = 7;
 int sleep_button = 6;
 int run_button = 5;
 int diagnosis_button = 4;
@@ -29,6 +29,11 @@ int fadeAmount = 5;  // how many points to fade the LED by
 
 int pattern_value;    // potentiometer value for the pattern of the run state
 int brightness_value;  // potentiometer value for the brightness of the run state
+
+volatile bool powerButtonPressed = false;
+volatile bool runButtonPressed = false;
+volatile bool sleepButtonPressed = false;
+volatile bool diagnosticButtonPressed = false;
 
 // NOTE: enum variables return an integer (their index in the enumeration)
 enum State { on, off, run, sleep, diagnostic };
@@ -59,7 +64,13 @@ void setup() {
 
 // the loop function runs over and over again forever
 void loop() {
-// NOTE: enum variables return an integer (their index in the enumeration)
+  Serial.println("top of loop");
+  
+  // see which state we are in
+  processButtons();
+  
+  // NOTE: enum variables return an integer (their index in the enumeration)
+  
 
   int pattern_value = analogRead(potent_pattern);
   int brightness_value = analogRead(potent_brightness);
@@ -90,43 +101,66 @@ void loop() {
 
 // Function Section below --------------------------------------------------------
 
-// This function updated curr_state after the power button was pressed
+// See if we have pressed power
 void power_pressed() {
-  Serial.println("power press");
-  // wait .1 s to prevent loop from running multiple times during one press (CANNOT USE delay())
-  //millisDelay(100);
-
-  if (curr_state == 1) {
-    Serial.println("changing to on");
-    curr_state = on; // change from off to on
-  } else {
-    Serial.println("changing to off");
-    curr_state = off; // change to off
-  } 
+  powerButtonPressed = true;
 }
 
-//Tell if we have pressed the run button
+// See if we have pressed run
 void run_pressed() {
+  runButtonPressed = true;
+}
+
+// See if we have pressed sleep
+void sleep_pressed() {
+  sleepButtonPressed = true;
+}
+
+// See if we have pressed diagnostic
+void diagnostic_pressed() {
+  diagnosticButtonPressed = true;
+}
+
+// Switch the state based off which button was pressed
+void processButtons() {
+  if (powerButtonPressed) {
+    powerButtonPressed = false;
+    // Handle power button press
+    if (curr_state == 1) {
+      Serial.println("changing to on");
+      curr_state = on; // change from off to on
+    } else {
+      Serial.println("changing to off");
+      curr_state = off; // change to off
+    } 
+  }
+
+  if (runButtonPressed) {
+    runButtonPressed = false;
+    // Handle run button press
     if (curr_state != 1) {
         Serial.println("changing to run");
         curr_state = run;
     }
-}
+  }
 
-//Tell if we have pressed sleep
-void sleep_pressed() {
+  if (sleepButtonPressed) {
+    sleepButtonPressed = false;
+    // Handle sleep button press
     if (curr_state != 1) {
         Serial.println("changing to sleep");
         curr_state = sleep;
     }
-}
+  }
 
-//Tell if we have diagnostic sleep
-void diagnostic_pressed() {
+  if (diagnosticButtonPressed) {
+    diagnosticButtonPressed = false;
+    // Handle diagnostic button press
     if (curr_state != 1) {
       Serial.println("changing to diagnostic");
       curr_state = diagnostic;
     }
+  }
 }
 
 
@@ -156,7 +190,7 @@ void off_state() {
 // State      : Run
 // Description: Green LED decay with time constant of 6 secs. 
 //              Flashes twice for duty cycle of 0.5 secs, then repeats while in state.
-// Status     : Fully functional
+// Status     : Not finished -- need to implement potentiometer work
 void run_state(int pattern, int brightness_potentiometer) {
   // turn the other LEDs off by making the voltage LOW
   digitalWrite(blue, LOW);   
@@ -169,7 +203,8 @@ void run_state(int pattern, int brightness_potentiometer) {
     //Serial.print("in loop");
     
     // change the brightness for next time through the loop:
-    brightness = brightness - fadeAmount - brightness_potentiometer;
+    //brightness = brightness - fadeAmount - brightness_potentiometer; // implement later
+    brightness = brightness - fadeAmount;
     
     // wait for 120 milliseconds to see the dimming effect
     millisDelay(120);
@@ -181,13 +216,21 @@ void run_state(int pattern, int brightness_potentiometer) {
   for (int i = 0; i < 2; i++) {
     digitalWrite(green, HIGH);  // turn the LED on (HIGH is the voltage level)
 
-    millisDelay(500 - (pattern/2));                 // wait for 0.5 s (or less depending on potentiometer value)
-    digitalWrite(green, LOW);   // turn the LED off by making the voltage LOW
-    millisDelay(500 - (pattern/2)); 
+    // millisDelay(500 - (pattern/2));                 // wait for 0.5 s (or less depending on potentiometer value)
+    // digitalWrite(green, LOW);   // turn the LED off by making the voltage LOW
+    // millisDelay(500 - (pattern/2)); 
 
-    millisDelay(500 - (pattern/2));                 // wait for 0.5 s (or less depending on potentiometer value)
+    // millisDelay(500 - (pattern/2));                 // wait for 0.5 s (or less depending on potentiometer value)
+    // digitalWrite(green, LOW);   // turn the LED off by making the voltage LOW
+    // millisDelay(500 - (pattern/2)); 
+
+    millisDelay(500);                 // wait for 0.5 s (or less depending on potentiometer value)
     digitalWrite(green, LOW);   // turn the LED off by making the voltage LOW
-    millisDelay(500 - (pattern/2)); 
+    millisDelay(500); 
+
+    millisDelay(500);                 // wait for 0.5 s (or less depending on potentiometer value)
+    digitalWrite(green, LOW);   // turn the LED off by making the voltage LOW
+    millisDelay(500); 
   } 
   
 }
