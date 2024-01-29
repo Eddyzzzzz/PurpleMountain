@@ -5,7 +5,15 @@
   Alex Lea, Connor Nightingale, Eddy Zhang, Jacob Carulli
 */
 
+<<<<<<< HEAD
 // Define Digital Pinouts
+=======
+//Define millis for timing
+unsigned long startMillis;
+unsigned long currentMillis;
+
+// Define Pinouts
+>>>>>>> 50fdef0f59e4e4bfe11845b5b7496323c6699bcd
 int red = 8;
 int green = 9;
 int blue = 10;
@@ -49,12 +57,15 @@ void setup() {
 
   // NOTE: enum variables are set using the names of the enumerations
   curr_state = run;
+  //Inital the start time
+  startMillis = millis();
 }
 
 // the loop function runs over and over again forever
 void loop() {
 // NOTE: enum variables return an integer (their index in the enumeration)
 
+<<<<<<< HEAD
   int pattern_value = analogRead(potent_pattern);
   int brightness_value = analogRead(potent_brightness);
 
@@ -83,6 +94,30 @@ void loop() {
 
   
   Serial.println(potentiometer);
+=======
+  if (curr_state == 0) {
+    Serial.println("on");
+    on_state();
+  }
+  else if (curr_state == 1) {
+    Serial.println("off");
+    off_state();
+  }
+  else if (curr_state == 2) {
+    Serial.println("run");
+    run_state(potent_value);
+  }
+  else if (curr_state == 3) {
+    Serial.println("sleep");
+    sleep_state();
+  }
+  else {
+    Serial.println("diagnostic");
+    diagnostic_state();
+  }
+  //Serial.println(digitalRead(2));
+  millisDelay(100);
+>>>>>>> 50fdef0f59e4e4bfe11845b5b7496323c6699bcd
 }
 
 // Function Section below --------------------------------------------------------
@@ -137,9 +172,9 @@ void on_state() {
   digitalWrite(green, LOW); 
 
   digitalWrite(red, HIGH);  // turn the LED on (HIGH is the voltage level)
-  delay(100);                      // wait for 0.1 s (10 Hz)
+  millisDelay(100);                      // wait for 0.1 s (10 Hz)
   digitalWrite(red, LOW);   // turn the LED off by making the voltage LOW
-  delay(100);                      // wait for 0.1 s (10 Hz)
+  millisDelay(100);                      // wait for 0.1 s (10 Hz)
 }
 
 // State      : Off
@@ -155,8 +190,16 @@ void off_state() {
 // Description: Green LED decay with time constant of 6 secs. 
 //              Flashes twice for duty cycle of 0.5 secs, then repeats while in state.
 // Status     : Fully functional
+<<<<<<< HEAD
 void run_state(int pattern, int brightness_potentiometer) {
   
+=======
+void run_state(unsigned long potent) {
+  Serial.print("top");
+  int potentiometer = analogRead(4);
+  //Serial.print(potentiometer);
+
+>>>>>>> 50fdef0f59e4e4bfe11845b5b7496323c6699bcd
   // turn the other LEDs off by making the voltage LOW
   digitalWrite(blue, LOW);   
   digitalWrite(red, LOW); 
@@ -173,7 +216,7 @@ void run_state(int pattern, int brightness_potentiometer) {
     brightness = brightness - fadeAmount - brightness_potentiometer;
     
     // wait for 120 milliseconds to see the dimming effect
-    delay(120);
+    millisDelay(120);
 
     // write brightness
     analogWrite(green, brightness);
@@ -181,9 +224,15 @@ void run_state(int pattern, int brightness_potentiometer) {
 
   for (int i = 0; i < 2; i++) {
     digitalWrite(green, HIGH);  // turn the LED on (HIGH is the voltage level)
+<<<<<<< HEAD
     delay(500 - (pattern/2));                 // wait for 0.5 s (2 Hz)
     digitalWrite(green, LOW);   // turn the LED off by making the voltage LOW
     delay(500 - (pattern/2)); 
+=======
+    millisDelay(500 - potent);                 // wait for 0.5 s (2 Hz)
+    digitalWrite(green, LOW);   // turn the LED off by making the voltage LOW
+    millisDelay(500 - potent); 
+>>>>>>> 50fdef0f59e4e4bfe11845b5b7496323c6699bcd
   } 
   
 }
@@ -200,9 +249,9 @@ void sleep_state() {
   // Blink @ 4 Hz for 1 sec
   for (int i = 0; i < 2; i++) {
     digitalWrite(blue, HIGH);  // turn the LED on (HIGH is the voltage level)
-    delay(250);               
+    millisDelay(250);               
     digitalWrite(blue, LOW);   // turn the LED off by making the voltage LOW
-    delay(250); 
+    millisDelay(250); 
   } 
 
   // Fade 
@@ -214,7 +263,7 @@ void sleep_state() {
     brightness = brightness - fadeAmount;
     
     // wait for 20 milliseconds to see the dimming effect
-    delay(20);
+    millisDelay(20);
 
     // write brightness
     analogWrite(blue, brightness);
@@ -229,6 +278,7 @@ void sleep_state() {
 // Status     : Working
 void diagnostic_state() {
   // we eventually need to blink N times for N problems
+  const unsigned long period = 200;
 
   // for now, just blink red once
 
@@ -238,10 +288,15 @@ void diagnostic_state() {
 
   //for (int i = 0; i < num_error; i++) {
     digitalWrite(red, HIGH);  // turn the LED on (HIGH is the voltage level)
-    delay(200);                      
+    millisDelay(200);                      
     digitalWrite(red, LOW);   // turn the LED off by making the voltage LOW
-    delay(200);                      
+    millisDelay(200);                      
   //}
 
   // delay(10000)                // delay for 10 seconds 
+}
+
+void millisDelay( long int delayTime){
+  long int start_time = millis();
+  while ( millis() - start_time < delayTime) ;
 }
