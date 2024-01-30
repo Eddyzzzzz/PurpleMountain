@@ -10,10 +10,13 @@
 unsigned long startMillis;
 unsigned long currentMillis;
 
+<<<<<<< HEAD
 unsigned long prevLED1_Blink;
 unsigned long prevLED2_Blink;
 unsigned long prevLED2_Fade;
 
+=======
+>>>>>>> 2c5688c969463a76941eab7aed536eb2e1264f06
 // Define Digital Pinouts
 int red = 11;
 int green = 12;
@@ -41,10 +44,13 @@ volatile bool runButtonPressed = false;
 volatile bool sleepButtonPressed = false;
 volatile bool diagnosticButtonPressed = false;
 
+<<<<<<< HEAD
 //Define variables for controlling run state
 volatile bool fading = false;
 int flash_count = 0;
 
+=======
+>>>>>>> 2c5688c969463a76941eab7aed536eb2e1264f06
 volatile bool switch1_val = digitalRead(switch1);
 volatile bool switch2_val = digitalRead(switch2);
 
@@ -81,10 +87,13 @@ void setup() {
   curr_state = run;
   //Inital the start time
   startMillis = millis();
+<<<<<<< HEAD
   //Initalize LED times for run state
   prevLED1_Blink = 0;
   prevLED2_Blink = 0;
   prevLED2_Fade = 0;
+=======
+>>>>>>> 2c5688c969463a76941eab7aed536eb2e1264f06
 
   error_count = 5;
 }
@@ -252,6 +261,11 @@ void run_state(int pattern, int brightness_potentiometer) {
 
   int potent_amount = brightness_potentiometer / 20; // brightness_potentiometer lies between 0 and 1000
                                                   // so, potent_amount lies between 0 and 50
+<<<<<<< HEAD
+
+  int delay_time = 500 - (pattern/2); // pattern lies between 0 and 1000
+                                  // so, delay_time lies between 0 and 500
+=======
 
   int delay_time = 500 - (pattern/2); // pattern lies between 0 and 1000
                                   // so, delay_time lies between 0 and 500
@@ -261,6 +275,22 @@ void run_state(int pattern, int brightness_potentiometer) {
     delay_time = 0;
   }
 
+  while (brightness > 0) {
+    //Serial.print("in loop");
+    
+    // change the brightness for next time through the loop:
+    brightness = brightness - fadeAmount - potent_amount;
+    
+    // wait for 120 milliseconds to see the dimming effect
+    millisDelay(120);
+>>>>>>> 2c5688c969463a76941eab7aed536eb2e1264f06
+
+  // ensures we do not have a negative delay time
+  if (delay_time < 0) {
+    delay_time = 0;
+  }
+
+<<<<<<< HEAD
 
   //Control fading
   if (fading){
@@ -310,6 +340,20 @@ void run_state(int pattern, int brightness_potentiometer) {
   if (switch2_val){
     digitalWrite(red, HIGH);
   }
+=======
+  for (int i = 0; i < 2; i++) {
+    digitalWrite(green, HIGH);  // turn the LED on (HIGH is the voltage level)
+
+    millisDelay(delay_time);                 // wait for 0.5 s (or less depending on potentiometer value)
+    digitalWrite(green, LOW);   // turn the LED off by making the voltage LOW
+    millisDelay(delay_time); 
+
+    millisDelay(delay_time);                 // wait for 0.5 s (or less depending on potentiometer value)
+    digitalWrite(green, LOW);   // turn the LED off by making the voltage LOW
+    millisDelay(delay_time); 
+  } 
+  
+>>>>>>> 2c5688c969463a76941eab7aed536eb2e1264f06
 }
 
 // State      : Sleep
