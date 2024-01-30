@@ -14,10 +14,12 @@ unsigned long currentMillis;
 int red = 8;
 int green = 9;
 int blue = 10;
-int power_button = 7;
-int sleep_button = 6;
-int run_button = 5;
-int diagnosis_button = 4;
+int power_button = 6;
+int sleep_button = 5;
+int run_button = 4;
+int diagnosis_button = 3;
+int switch_1 = 13;
+int switch_2 = 12;
 
 // Define Analog Pinouts
 int potent_pattern = 4;
@@ -34,6 +36,10 @@ volatile bool powerButtonPressed = false;
 volatile bool runButtonPressed = false;
 volatile bool sleepButtonPressed = false;
 volatile bool diagnosticButtonPressed = false;
+volatile bool switch1Closed = false;
+volatile bool switch2Opened = false;
+
+static int error_count;
 
 // NOTE: enum variables return an integer (their index in the enumeration)
 enum State { on, off, run, sleep, diagnostic };
@@ -50,16 +56,20 @@ void setup() {
   pinMode(blue, OUTPUT);
   pinMode(green, OUTPUT);
 
-  // loop is current ISR function, might need adjustment
+  // Establish ISR function for each digital input which acts as an interrupt
   attachInterrupt(digitalPinToInterrupt(power_button), power_pressed, RISING);
   attachInterrupt(digitalPinToInterrupt(run_button), run_pressed, RISING);
   attachInterrupt(digitalPinToInterrupt(sleep_button), sleep_pressed, RISING);
   attachInterrupt(digitalPinToInterrupt(diagnosis_button), diagnostic_pressed, RISING);
+  attachInterrupt(digitalPinToInterrupt(switch_1), switch_1_closed, RISING);
+  attachInterrupt(digitalPinToInterrupt(switch_2), switch_2_opened, FALLING);
 
   // NOTE: enum variables are set using the names of the enumerations
   curr_state = run;
   //Inital the start time
   startMillis = millis();
+
+  error_count = 5;
 }
 
 // the loop function runs over and over again forever
@@ -75,19 +85,19 @@ void loop() {
   int pattern_value = analogRead(potent_pattern);
   int brightness_value = analogRead(potent_brightness);
 
-  if (curr_state == 0) {
+  if (curr_state == on) {
     Serial.println("on");
     on_state();
   }
-  else if (curr_state == 1) {
+  else if (curr_state == off) {
     Serial.println("off");
     off_state();
   }
-  else if (curr_state == 2) {
+  else if (curr_state == run) {
     Serial.println("run");
     run_state(pattern_value, brightness_value);
   }
-  else if (curr_state == 3) {
+  else if (curr_state == sleep) {
     Serial.println("sleep");
     sleep_state();
   }
@@ -121,12 +131,21 @@ void diagnostic_pressed() {
   diagnosticButtonPressed = true;
 }
 
+void switch_1_closed() {
+  switch1Closed = true;
+}
+
+void switch_2_opened() {
+  switch2Opened = true;
+}
+
+
 // Switch the state based off which button was pressed
 void processButtons() {
   if (powerButtonPressed) {
     powerButtonPressed = false;
     // Handle power button press
-    if (curr_state == 1) {
+    if (curr_state == off) {
       Serial.println("changing to on");
       curr_state = on; // change from off to on
     } else {
@@ -138,7 +157,7 @@ void processButtons() {
   if (runButtonPressed) {
     runButtonPressed = false;
     // Handle run button press
-    if (curr_state != 1) {
+    if (curr_state != off) {
         Serial.println("changing to run");
         curr_state = run;
     }
@@ -147,7 +166,7 @@ void processButtons() {
   if (sleepButtonPressed) {
     sleepButtonPressed = false;
     // Handle sleep button press
-    if (curr_state != 1) {
+    if (curr_state != off) {
         Serial.println("changing to sleep");
         curr_state = sleep;
     }
@@ -156,10 +175,14 @@ void processButtons() {
   if (diagnosticButtonPressed) {
     diagnosticButtonPressed = false;
     // Handle diagnostic button press
-    if (curr_state != 1) {
+    if (curr_state != off) {
       Serial.println("changing to diagnostic");
       curr_state = diagnostic;
     }
+    // Used to test functionality of error_count for diagnostics
+    //if (curr_state == diagnostic) {
+    //  error_count++;
+    //}
   }
 }
 
@@ -285,12 +308,13 @@ void diagnostic_state() {
   digitalWrite(blue, LOW);   
   digitalWrite(green, LOW); 
 
-  //for (int i = 0; i < num_error; i++) {
+  for (int i = 0; i < error_count; i++) {
     digitalWrite(red, HIGH);  // turn the LED on (HIGH is the voltage level)
     millisDelay(200);                      
     digitalWrite(red, LOW);   // turn the LED off by making the voltage LOW
     millisDelay(200);                      
-  //}
+  }
+  millisDelay(2000);
 
 }
 
