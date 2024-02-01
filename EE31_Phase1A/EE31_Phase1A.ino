@@ -10,21 +10,19 @@
 unsigned long startMillis;
 unsigned long currentMillis;
 
-<<<<<<< HEAD
-unsigned long prevLED1_Blink;
-unsigned long prevLED2_Blink;
-unsigned long prevLED2_Fade;
+//Global counters
+unsigned long prevBlueBlink;
+unsigned long prevGreenBlink;
+unsigned long prevGreenFade;
 
-=======
->>>>>>> 2c5688c969463a76941eab7aed536eb2e1264f06
 // Define Digital Pinouts
 int red = 11;
-int green = 12;
-int blue = 13;
+int green = 10;
+int blue = 12;
 int power_button = 9;
 int sleep_button = 8;
 int run_button = 7;
-int diagnosis_button = 6;
+int diagnosis_button = 5;
 int switch1 = 3;
 int switch2 = 2;
 
@@ -44,15 +42,12 @@ volatile bool runButtonPressed = false;
 volatile bool sleepButtonPressed = false;
 volatile bool diagnosticButtonPressed = false;
 
-<<<<<<< HEAD
 //Define variables for controlling run state
-volatile bool fading = false;
+bool fading = true;
 int flash_count = 0;
-
-=======
->>>>>>> 2c5688c969463a76941eab7aed536eb2e1264f06
-volatile bool switch1_val = digitalRead(switch1);
-volatile bool switch2_val = digitalRead(switch2);
+volatile bool blue_fast = false;
+volatile bool red_on = false;
+uint8_t blueLED_run_state_val = HIGH;
 
 static int error_count;
 
@@ -79,21 +74,17 @@ void setup() {
   attachInterrupt(digitalPinToInterrupt(diagnosis_button), diagnostic_pressed, RISING);
 
   attachInterrupt(digitalPinToInterrupt(switch1), switch1_close, RISING);
-  attachInterrupt(digitalPinToInterrupt(switch1), switch1_open, FALLING);
-  attachInterrupt(digitalPinToInterrupt(switch2), switch2_close, RISING);
   attachInterrupt(digitalPinToInterrupt(switch2), switch2_open, FALLING);
 
   // NOTE: enum variables are set using the names of the enumerations
   curr_state = run;
   //Inital the start time
   startMillis = millis();
-<<<<<<< HEAD
+
   //Initalize LED times for run state
-  prevLED1_Blink = 0;
-  prevLED2_Blink = 0;
-  prevLED2_Fade = 0;
-=======
->>>>>>> 2c5688c969463a76941eab7aed536eb2e1264f06
+  prevBlueBlink = 0;
+  prevGreenBlink = 0;
+  prevGreenFade = 0;
 
   error_count = 5;
 }
@@ -111,26 +102,26 @@ void loop() {
   int brightness_value = analogRead(potent_brightness);
 
 
-  // if (curr_state == 0) {
-  //   Serial.println("on");
-  //   on_state();
-  // }
-  // else if (curr_state == 1) {
-  //   Serial.println("off");
-  //   off_state();
-  // }
-  // else if (curr_state == 2) {
-  //   Serial.println("run");
-  //   run_state(pattern_value, brightness_value);
-  // }
-  // else if (curr_state == 3) {
-  //   Serial.println("sleep");
-  //   sleep_state();
-  // }
-  // else {
-  //   Serial.println("diagnostic");
-  //   diagnostic_state();
-  // }
+  if (curr_state == 0) {
+    Serial.println("on");
+    on_state();
+  }
+  else if (curr_state == 1) {
+    Serial.println("off");
+    off_state();
+  }
+  else if (curr_state == 2) {
+    Serial.println("run");
+    run_state(pattern_value, brightness_value);
+  }
+  else if (curr_state == 3) {
+    Serial.println("sleep");
+    sleep_state();
+  }
+  else {
+    Serial.println("diagnostic");
+    diagnostic_state();
+  }
 
   millisDelay(100);
 }
@@ -159,22 +150,14 @@ void diagnostic_pressed() {
 
 // See if we have turned switch1 on
 void switch1_close() {
-  switch1_val = true;
-}
-
-// See if we have turned switch1 off
-void switch1_open() {
-  switch1_val = false;
-}
-
-// See if we have turned switch2 on
-void switch2_close() {
-  switch2_val = true;
+  blue_fast = true;
 }
 
 // See if we have turned switch2 off
 void switch2_open() {
-  switch2_val = false;
+  if (blue_fast) {
+    red_on = true;
+  }
 }
 
 // Switch the state based off which button was pressed
@@ -256,16 +239,8 @@ void run_state(int pattern, int brightness_potentiometer) {
   digitalWrite(blue, LOW);   
   digitalWrite(red, LOW); 
 
-  // set the brightness of pin 12:
-  analogWrite(green, brightness = 255);
-
   int potent_amount = brightness_potentiometer / 20; // brightness_potentiometer lies between 0 and 1000
                                                   // so, potent_amount lies between 0 and 50
-<<<<<<< HEAD
-
-  int delay_time = 500 - (pattern/2); // pattern lies between 0 and 1000
-                                  // so, delay_time lies between 0 and 500
-=======
 
   int delay_time = 500 - (pattern/2); // pattern lies between 0 and 1000
                                   // so, delay_time lies between 0 and 500
@@ -275,85 +250,78 @@ void run_state(int pattern, int brightness_potentiometer) {
     delay_time = 0;
   }
 
-  while (brightness > 0) {
+//  while (brightness > 0) {
     //Serial.print("in loop");
     
     // change the brightness for next time through the loop:
-    brightness = brightness - fadeAmount - potent_amount;
+//    brightness = brightness - fadeAmount - potent_amount;
     
     // wait for 120 milliseconds to see the dimming effect
-    millisDelay(120);
->>>>>>> 2c5688c969463a76941eab7aed536eb2e1264f06
+//    millisDelay(120);
 
   // ensures we do not have a negative delay time
-  if (delay_time < 0) {
-    delay_time = 0;
-  }
-
-<<<<<<< HEAD
+//  if (delay_time < 0) {
+//    delay_time = 0;
+//  }
 
   //Control fading
-  if (fading){
+  if (fading) {
     //Let the function fade slowly
-    if (brightness > 0 and currentMillis - prevLED2_Fade > 120){
-      brightness = brightness - fadeAmount - potent_amount;
+// Connor's Code
+//    if (brightness > 0 and currentMillis - prevLED2_Fade > 120){
+//      brightness = brightness - fadeAmount - potent_amount;
+//      analogWrite(green, brightness);
+//    }
+    if (brightness > 0) {
+      brightness -= (fadeAmount + potent_amount);
       analogWrite(green, brightness);
-    }
-    //Once done fading switch states
-    else {
+    } else {
       fading = false;
     }
-  }
-
-  //Control blinks of green LED
-  if (not fading){
-    if (currentMillis - prevLED2_Blink > delay_time){
-      if (flash_count % 2){
-        analogWrite(green, 255);
-      }
-      else{
-        analogWrite(green, 0);
-      }
-      prevLED2_Blink += delay_time;
+  } else {
+    if (flash_count % 2) {
+      digitalWrite(green, LOW);
+    } else {
+      digitalWrite(green, HIGH);
+    }
+    if ((millis() - prevGreenBlink) > delay_time) {
+      prevGreenBlink = millis();
       flash_count++;
-    }
-    else if (flash_count % 4){
-      fading = true;
-    }
+      Serial.print(flash_count);
+      if (flash_count % 4 == 0) {
+        brightness = 255;
+        fading = true;
+      }
+    } 
   }
 
   //Control Blinks of Blue LED
-  if (switch1_val){
-    if (currentMillis - prevLED1_Blink > 100){
-      prevLED1_Blink += 100;
-      //Toggle LED
+  digitalWrite(blue, blueLED_run_state_val);
+  Serial.print(blue_fast);
+  if (blue_fast) {
+    if (millis() - prevBlueBlink > 100) {
+      if (blueLED_run_state_val == HIGH) {
+        blueLED_run_state_val = LOW;
+      } else {
+        blueLED_run_state_val = HIGH;
+      }
+      prevBlueBlink = millis();
     }
-  }
-  else{
-    if (currentMillis - prevLED1_Blink > 1000){
-      prevLED1_Blink += 1000;
-      //Toggle LED
+  } else {
+    if (millis() - prevBlueBlink > 1000) {
+      if (blueLED_run_state_val == HIGH) {
+        blueLED_run_state_val = LOW;
+      } else {
+        blueLED_run_state_val = HIGH;
+      }
+      prevBlueBlink = millis();
     }
   }
 
   //Turn red LED on or off depending on second switch
-  if (switch2_val){
+  if (red_on){
     digitalWrite(red, HIGH);
   }
-=======
-  for (int i = 0; i < 2; i++) {
-    digitalWrite(green, HIGH);  // turn the LED on (HIGH is the voltage level)
-
-    millisDelay(delay_time);                 // wait for 0.5 s (or less depending on potentiometer value)
-    digitalWrite(green, LOW);   // turn the LED off by making the voltage LOW
-    millisDelay(delay_time); 
-
-    millisDelay(delay_time);                 // wait for 0.5 s (or less depending on potentiometer value)
-    digitalWrite(green, LOW);   // turn the LED off by making the voltage LOW
-    millisDelay(delay_time); 
-  } 
-  
->>>>>>> 2c5688c969463a76941eab7aed536eb2e1264f06
 }
 
 // State      : Sleep
