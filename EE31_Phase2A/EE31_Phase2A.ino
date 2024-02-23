@@ -6,10 +6,10 @@
 */
 
 // Define Digital Pinouts
-int s1 = 10;
-int s2 = 3;
-int s3 = 11;
-int s4 = 5;
+int s1 = 5;
+int s2 = 6;
+int s3 = 10;
+int s4 = 9;
 
 //Define millis for timing
 unsigned long startMillis;
@@ -38,41 +38,43 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  //millisDelay(100);
+  
 
-  // turn on motor clockwise
-  digitalWrite(s1, LOW);  
-  digitalWrite(s2, LOW);
-  digitalWrite(s3, HIGH);
-  digitalWrite(s4, HIGH);
+  //This code  will turn Motor A clockwise for 2 sec.
+    digitalWrite(s1, HIGH);
+    digitalWrite(s2, LOW);
+    digitalWrite(s3, LOW);
+    digitalWrite(s4, LOW);
+    millisDelay(2000); 
 
-  millisDelay(1000);
+    //This code will turn Motor A counter-clockwise for 2 sec.
+    digitalWrite(s1, LOW);
+    digitalWrite(s2, HIGH);
+    digitalWrite(s3, LOW);
+    digitalWrite(s4, LOW);
+    millisDelay(2000);
+    
+    // //This code will turn Motor B clockwise for 2 sec.
+    // digitalWrite(s1, LOW);
+    // digitalWrite(s2, LOW);
+    // digitalWrite(s3, HIGH);
+    // digitalWrite(s4, LOW);
+    // millisDelay(2000);
 
-  // decelerate motor
-  digitalWrite(s1, LOW);  
-  digitalWrite(s2, LOW);
-  digitalWrite(s3, LOW);
-  digitalWrite(s4, LOW);
-
-  millisDelay(1000);
-
-  // turn on motor counter-clockwise
-  digitalWrite(s1, HIGH);  
-  digitalWrite(s2, HIGH);
-  digitalWrite(s3, LOW);
-  digitalWrite(s4, LOW);
-
-  millisDelay(1000);
-
-  // decelerate motor
-  digitalWrite(s1, LOW);  
-  digitalWrite(s2, LOW);
-  digitalWrite(s3, LOW);
-  digitalWrite(s4, LOW);
-
-  millisDelay(1000);
+    // //This code will turn Motor B counter-clockwise for 2 sec.
+    // digitalWrite(s1, LOW);
+    // digitalWrite(s2, LOW);
+    // digitalWrite(s3, LOW);
+    // digitalWrite(s4, HIGH);
+    // millisDelay(2000);    
+    
+    //And this code will stop motors
+    digitalWrite(s1, LOW);
+    digitalWrite(s2, LOW);
+    digitalWrite(s3, LOW);
+    digitalWrite(s4, LOW); 
+    millisDelay(2000);
 }
-
 
 void millisDelay( long int delayTime){
   long int start_time = millis();
