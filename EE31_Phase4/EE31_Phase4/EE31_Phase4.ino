@@ -26,11 +26,11 @@ char postBody[] = "direction=1&speed=2";
 
 // format of postRoute: "POST /senderID/receiverID HTTP/1.1"
 // char postRoute[] = "POST /89C87865077A/8050D1451904 HTTP/1.1"; // posting will fail with this ID combo, no idea why
-char postRoute[] = "POST /89C87865077A/89C87865077A HTTP/1.1"; // sending from ourselves to ourselves
+char postRoute[] = "POST /89C87865077A/A20F65BA5E3C HTTP/1.1"; // sending from ourselves to ourselves
 
 // format of gettRoute: "GET /senderID/receiverID HTTP/1.1"
 // char getRoute[] = "GET /89C87865077A/8050D1451904 HTTP/1.1";
-char getRoute[] = "GET /89C87865077A/89C87865077A HTTP/1.1"; 
+char getRoute[] = "GET /89C87865077A/A20F65BA5E3C HTTP/1.1"; 
 
 // defining client
 WiFiClient client;
