@@ -26,11 +26,11 @@ char postBody[] = "direction=1&speed=2";
 
 // format of postRoute: "POST /senderID/receiverID HTTP/1.1"
 // char postRoute[] = "POST /89C87865077A/8050D1451904 HTTP/1.1"; // posting will fail with this ID combo, no idea why
-char postRoute[] = "POST /89C87865077A/A20F65BA5E3C HTTP/1.1"; // sending from ourselves to ourselves
+char postRoute[] = "POST /89C87865077A/89C87865077A HTTP/1.1"; // sending from ourselves to ourselves
 
 // format of gettRoute: "GET /senderID/receiverID HTTP/1.1"
 // char getRoute[] = "GET /89C87865077A/8050D1451904 HTTP/1.1";
-char getRoute[] = "GET /89C87865077A/A20F65BA5E3C HTTP/1.1"; 
+char getRoute[] = "GET /89C87865077A/89C87865077A HTTP/1.1"; 
 
 // defining client
 WiFiClient client;
@@ -52,6 +52,7 @@ void printWifiStatus() {
 
 // post message from sender to the receiver
 void POSTServer(const char theRoute[], char *bodyMessage) {
+  Serial.println("I'm sending!");
   if (client.connect(server, portNumber)) {
     client.println(theRoute);
     client.print("Host: ");
@@ -95,15 +96,16 @@ void GETServer(const char theRoute[], char *message) {
 
     // index for writing to message buffer
     int messageIndex = 0;
-
+    delay(200);
     // print out the client response
     while (client.connected()) {
+      
       if (client.available()) {
         // read an incoming byte from the server and print it to serial monitor:
         char c = client.read();
         message[messageIndex++] = c;
         // Check if the buffer is full
-        if (messageIndex >= buffer_size) {
+        if (messageIndex >= 16) {
           break; // Stop reading to avoid overflow
         }
       }
@@ -163,9 +165,13 @@ void setup() {
 
   // Try one GET
   GETServer(getRoute, messageData);
+  Serial.println(messageData);00,,
 }
 
 void loop() {
+  while(1) {
+    delay(1000);
+  };
   // Actual implementation tbd 
 }
 
